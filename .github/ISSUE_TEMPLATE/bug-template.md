@@ -1,6 +1,6 @@
 ---
-name: "[Controller name, Method /endpoint] Bug' summary"
-about: Create a report to help us improve
+name: Bug template
+about: "[Controller name, Method /endpoint] Bug' summary"
 title: ''
 labels: api-, bug
 assignees: ''
