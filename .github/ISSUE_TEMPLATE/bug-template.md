@@ -1,7 +1,7 @@
 ---
 name: Bug template
-about: "[Controller name, Method /endpoint] Bug' summary"
-title: ''
+about: " [Controller name, Method /endpoint] Bug' summary "
+title: " [Controller name, Method /endpoint] Bug' summary "
 labels: api-, bug
 assignees: ''
 
