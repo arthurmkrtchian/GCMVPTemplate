@@ -2,7 +2,7 @@
 name: "[Controller name, Method /endpoint] Bug' summary"
 about: Create a report to help us improve
 title: ''
-labels: ''
+labels: api-, bug
 assignees: ''
 
 ---
