@@ -47,7 +47,6 @@ public class ShoppingListItemControllerTest {
     private MockMvc mockMvc;
     private static final String shoppingListItemControllerLink = "/user/shopping-list-items";
     private final Principal principal = getPrincipal();
-    private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
     @BeforeEach
     void setup(){
@@ -60,7 +59,6 @@ public class ShoppingListItemControllerTest {
         shoppingListItemController = new ShoppingListItemController(shoppingListItemService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(shoppingListItemController)
                 .setCustomArgumentResolvers(new UserArgumentResolver(userService, modelMapper))
-                .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
                 .build();
     }
 
