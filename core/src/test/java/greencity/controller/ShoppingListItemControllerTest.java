@@ -4,15 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.enums.ShoppingListItemStatus;
-import greencity.exception.handler.CustomExceptionHandler;
 import greencity.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
 
 import java.util.*;
 
@@ -28,6 +25,7 @@ import greencity.dto.user.UserVO;
 import greencity.service.ShoppingListItemService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.security.Principal;
 
 public class ShoppingListItemControllerTest {
@@ -39,8 +37,7 @@ public class ShoppingListItemControllerTest {
     private UserVO userVO;
     @Mock
     private ModelMapper modelMapper;
-    @Mock
-    private ObjectMapper objectMapper;
+
     @Mock
     private UserService userService;
     private Locale locale;
@@ -49,14 +46,17 @@ public class ShoppingListItemControllerTest {
     private final Principal principal = getPrincipal();
 
     @BeforeEach
-    void setup(){
+    void setup() {
         userVO = getUserVO();
         userService = mock(UserService.class);
         modelMapper = mock(ModelMapper.class);
+
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(modelMapper.map(userVO, UserVO.class)).thenReturn(userVO);
+
         shoppingListItemService = mock(ShoppingListItemService.class);
         shoppingListItemController = new ShoppingListItemController(shoppingListItemService);
+
         this.mockMvc = MockMvcBuilders.standaloneSetup(shoppingListItemController)
                 .setCustomArgumentResolvers(new UserArgumentResolver(userService, modelMapper))
                 .build();
@@ -119,11 +119,11 @@ public class ShoppingListItemControllerTest {
         Long userShoppingListItemId = 1L;
         locale = Locale.US;
 
-        mockMvc.perform(patch(shoppingListItemControllerLink+"/{userShoppingListItemId}", userShoppingListItemId)
+        mockMvc.perform(patch(shoppingListItemControllerLink + "/{userShoppingListItemId}", userShoppingListItemId)
                         .principal(principal))
                 .andExpect(status().isCreated());
 
-        verify(shoppingListItemService).updateUserShopingListItemStatus(userVO.getId(), userShoppingListItemId,locale.getLanguage());
+        verify(shoppingListItemService).updateUserShopingListItemStatus(userVO.getId(), userShoppingListItemId, locale.getLanguage());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ShoppingListItemControllerTest {
         String status = "DONE";
         locale = Locale.US;
 
-        mockMvc.perform(patch(shoppingListItemControllerLink+"/{userShoppingListItemId}/status/{status}",
+        mockMvc.perform(patch(shoppingListItemControllerLink + "/{userShoppingListItemId}/status/{status}",
                         userShoppingListItemId, status)
                         .principal(principal))
                 .andExpect(status().isOk());
@@ -169,6 +169,6 @@ public class ShoppingListItemControllerTest {
                         .principal(principal))
                 .andExpect(status().isOk());
 
-        verify(shoppingListItemService).deleteUserShoppingListItems(commaSeparatedIds); // Verify that the service method was called
+        verify(shoppingListItemService).deleteUserShoppingListItems(commaSeparatedIds);
     }
 }
