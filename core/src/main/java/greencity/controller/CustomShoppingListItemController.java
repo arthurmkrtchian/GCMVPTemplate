@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -129,7 +130,7 @@ public class CustomShoppingListItemController {
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
-    @DeleteMapping("/{userId}/custom-shopping-list-items")
+    @DeleteMapping(value = "/{userId}/custom-shopping-list-items", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Long>> bulkDeleteCustomShoppingListItems(
         @ApiParam(value = "Ids of custom shopping-list-items separated by a comma \n e.g. 1,2",
             required = true) @RequestParam String ids,
@@ -152,7 +153,7 @@ public class CustomShoppingListItemController {
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
-    @GetMapping("/{userId}/custom-shopping-list-items")
+    @GetMapping(value = "/{userId}/custom-shopping-list-items", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<CustomShoppingListItemResponseDto>> getAllCustomShoppingItemsByStatus(
         @PathVariable @CurrentUserId Long userId,
         @ApiParam(value = "Available values : ACTIVE, DONE, DISABLED, INPROGRESS."
