@@ -1,140 +1,176 @@
 package greencity.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import greencity.converters.UserArgumentResolver;
+import greencity.dto.shoppinglistitem.ShoppingListItemDto;
 import greencity.enums.ShoppingListItemStatus;
-import org.junit.Test;
+import greencity.exception.handler.CustomExceptionHandler;
+import greencity.service.UserService;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import static org.junit.Assert.assertEquals;
+import org.modelmapper.ModelMapper;
+import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
+
+import java.util.*;
+
+import static greencity.ModelUtils.getPrincipal;
+import static greencity.ModelUtils.getUserVO;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import greencity.controller.ShoppingListItemController;
 import greencity.dto.shoppinglistitem.ShoppingListItemRequestDto;
 import greencity.dto.user.UserShoppingListItemResponseDto;
 import greencity.dto.user.UserVO;
 import greencity.service.ShoppingListItemService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.User;
+import java.security.Principal;
 
-import java.util.Locale;
-@RunWith(MockitoJUnitRunner.class)
 public class ShoppingListItemControllerTest {
     @InjectMocks
     private ShoppingListItemController shoppingListItemController;
-
     @Mock
     private ShoppingListItemService shoppingListItemService;
-
     @Mock
-    private UserVO user;
-
+    private UserVO userVO;
+    @Mock
+    private ModelMapper modelMapper;
+    @Mock
+    private ObjectMapper objectMapper;
+    @Mock
+    private UserService userService;
     private Locale locale;
-
     private MockMvc mockMvc;
+    private static final String shoppingListItemControllerLink = "/user/shopping-list-items";
+    private final Principal principal = getPrincipal();
+    private final ErrorAttributes errorAttributes = new DefaultErrorAttributes();
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        locale = Locale.US;
+    void setup(){
+        userVO = getUserVO();
+        userService = mock(UserService.class);
+        modelMapper = mock(ModelMapper.class);
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+        when(modelMapper.map(userVO, UserVO.class)).thenReturn(userVO);
+        shoppingListItemService = mock(ShoppingListItemService.class);
+        shoppingListItemController = new ShoppingListItemController(shoppingListItemService);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(shoppingListItemController)
+                .setCustomArgumentResolvers(new UserArgumentResolver(userService, modelMapper))
+                .setControllerAdvice(new CustomExceptionHandler(errorAttributes, objectMapper))
+                .build();
     }
 
     @Test
-    public void saveUserShoppingListItemsTest() {
+    public void saveUserShoppingListItemsTest() throws Exception {
+        long habitId = 1L;
         List<ShoppingListItemRequestDto> requestDtoList = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(requestDtoList);
+
+        List<UserShoppingListItemResponseDto> responseDtoList = new ArrayList<>();
+        when(shoppingListItemService.saveUserShoppingListItems(anyLong(), anyLong(), anyList(), anyString()))
+                .thenReturn(responseDtoList);
+
+        mockMvc.perform(post(shoppingListItemControllerLink)
+                        .contentType("application/json")
+                        .content(jsonString)
+                        .param("habitId", Long.toString(habitId))
+                        .principal(principal)
+                        .param("locale", Locale.US.toLanguageTag()))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void getShoppingListItemsAssignedToUserTest() throws Exception {
+        Long habitId = 1L;
+        List<UserShoppingListItemResponseDto> shoppingListItems = Collections.singletonList(
+                new UserShoppingListItemResponseDto(1L, "Item 1", ShoppingListItemStatus.ACTIVE)
+        );
+
+        when(shoppingListItemService.getUserShoppingList(anyLong(), eq(habitId), anyString()))
+                .thenReturn(shoppingListItems);
+
+        mockMvc.perform(get(shoppingListItemControllerLink + "/habits/{habitId}/shopping-list", habitId)
+                        .principal(principal)
+                        .param("locale", Locale.US.toLanguageTag()))
+                .andExpect(status().isOk());
+        verify(shoppingListItemService).getUserShoppingList(anyLong(), eq(habitId), anyString());
+    }
+
+    @Test
+    public void deleteShoppingListItemTest() throws Exception {
+        Long habitId = 1L;
+        Long shoppingListItemId = 2L;
+
+        mockMvc.perform(delete(shoppingListItemControllerLink)
+                        .param("habitId", habitId.toString())
+                        .param("shoppingListItemId", shoppingListItemId.toString())
+                        .principal(principal))
+                .andExpect(status().isOk());
+
+        verify(shoppingListItemService).deleteUserShoppingListItemByItemIdAndUserIdAndHabitId(
+                shoppingListItemId, userVO.getId(), habitId);
+    }
+
+    @Test
+    public void updateUserShoppingListItemStatusTest() throws Exception {
+        Long userShoppingListItemId = 1L;
+        locale = Locale.US;
+
+        mockMvc.perform(patch(shoppingListItemControllerLink+"/{userShoppingListItemId}", userShoppingListItemId)
+                        .principal(principal))
+                .andExpect(status().isCreated());
+
+        verify(shoppingListItemService).updateUserShopingListItemStatus(userVO.getId(), userShoppingListItemId,locale.getLanguage());
+    }
+
+    @Test
+    public void updateUserShoppingListItemStatusWithStatusTest() throws Exception {
+        Long userShoppingListItemId = 1L;
+        String status = "DONE";
+        locale = Locale.US;
+
+        mockMvc.perform(patch(shoppingListItemControllerLink+"/{userShoppingListItemId}/status/{status}",
+                        userShoppingListItemId, status)
+                        .principal(principal))
+                .andExpect(status().isOk());
+
+        verify(shoppingListItemService).updateUserShoppingListItemStatus(userVO.getId(), userShoppingListItemId, locale.getLanguage(), status);
+    }
+
+    @Test
+    public void findInProgressByUserIdTest() throws Exception {
         Long userId = 1L;
-        Long habitId = 2L;
+        String languageCode = "en";
+        List<ShoppingListItemDto> inProgressItems = Collections.singletonList(new ShoppingListItemDto());
 
-        List<UserShoppingListItemResponseDto> someListOfUserShoppingListItemResponseDto = new ArrayList<>();
+        when(shoppingListItemService.findInProgressByUserIdAndLanguageCode(userId, languageCode))
+                .thenReturn(inProgressItems);
 
-        UserShoppingListItemResponseDto item1 = new UserShoppingListItemResponseDto();
-        item1.setId(1L);
-        item1.setText("Item 1");
-        item1.setStatus(ShoppingListItemStatus.ACTIVE);
+        mockMvc.perform(get(shoppingListItemControllerLink + "/{userId}/get-all-inprogress", userId)
+                        .param("lang", languageCode)
+                        .principal(principal))
+                .andExpect(status().isOk());
 
-        UserShoppingListItemResponseDto item2 = new UserShoppingListItemResponseDto();
-        item2.setId(2L);
-        item2.setText("Item 2");
-        item2.setStatus(ShoppingListItemStatus.ACTIVE);
-
-        someListOfUserShoppingListItemResponseDto.add(item1);
-        someListOfUserShoppingListItemResponseDto.add(item2);
-
-        when(shoppingListItemService.saveUserShoppingListItems(eq(userId), eq(habitId), anyList(), locale.getLanguage()))
-                .thenReturn(someListOfUserShoppingListItemResponseDto);
-
-        ResponseEntity<List<UserShoppingListItemResponseDto>> response =
-                shoppingListItemController.saveUserShoppingListItems(requestDtoList, user, 1L, locale);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        // Add more assertions as needed
+        verify(shoppingListItemService).findInProgressByUserIdAndLanguageCode(userId, languageCode);
     }
 
-
-
     @Test
-    public void getShoppingListItemsAssignedToUserTest() {
-        // Mock the service method
-//        when(shoppingListItemService.getUserShoppingList(anyLong(), anyLong(), anyString()))
-//                .thenReturn(someListOfUserShoppingListItemResponseDto);
+    public void bulkDeleteUserShoppingListItemsTest1() throws Exception {
+        String commaSeparatedIds = "1,2,3";
+        List<Long> deletedIds = Arrays.asList(1L, 2L, 3L);
 
-        // Perform the HTTP GET request and assert the response
-//        ResponseEntity<List<UserShoppingListItemResponseDto>> response =
-//                shoppingListItemController.getShoppingListItemsAssignedToUser(user, 1L, locale);
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Add more assertions as needed
-    }
-
-//    @Test
-//    public void deleteTest() throws Exception {
-//        // Create test data
-//        Long userId = 1L;
-//        Long userShoppingListItemId = 2L;
-//        Long habitId = 3L;
-//
-//        // Mock the service method to do nothing when delete is called
-//        doNothing().when(shoppingListItemService)
-//                .deleteUserShoppingListItemByItemIdAndUserIdAndHabitId(userShoppingListItemId, userId, habitId);
-//
-//        // Perform the HTTP DELETE request
-//        mockMvc.perform(delete("/user/shopping-list-items")
-//                        .param("userShoppingListItemId", userShoppingListItemId.toString())
-//                        .param("habitId", habitId.toString())
-//                        .principal(new UserPrincipal(userId))) // Simulate a user principal for authentication
-//                .andExpect(status().isOk()); // Expect HTTP status code 200 (OK)
-//    }
-
-    @Test
-    public void bulkDeleteUserShoppingListItemsTest() {
-        // Arrange
-        ShoppingListItemService shoppingListItemService = mock(ShoppingListItemService.class);
-        ShoppingListItemController shoppingListItemController = new ShoppingListItemController(shoppingListItemService);
-
-        String commaSeparatedIds = "1,2,3"; // Example comma-separated IDs
-        List<Long> deletedIds = Arrays.asList(1L, 2L, 3L); // IDs that will be deleted
-        UserVO user = new UserVO(); // Mock user object
-
-        // Mock the service method to return the list of deleted IDs
         when(shoppingListItemService.deleteUserShoppingListItems(commaSeparatedIds)).thenReturn(deletedIds);
 
-        // Act
-        ResponseEntity<List<Long>> response = shoppingListItemController.bulkDeleteUserShoppingListItems(commaSeparatedIds, user);
+        mockMvc.perform(delete(shoppingListItemControllerLink + "/user-shopping-list-items")
+                        .param("ids", commaSeparatedIds)
+                        .principal(principal))
+                .andExpect(status().isOk());
 
-        // Assert
         verify(shoppingListItemService).deleteUserShoppingListItems(commaSeparatedIds); // Verify that the service method was called
-        assertEquals(HttpStatus.OK, response.getStatusCode()); // Verify the response status code
-        assertEquals(deletedIds, response.getBody()); // Verify that the response body contains the deleted IDs
     }
-
 }
