@@ -78,7 +78,7 @@ class HabitStatisticControllerTest {
                          "  \"habitRate\": \"DEFAULT\"\n" +
                          "}";
 
-        mockMvc.perform(post(habitStatisticControllerLink + "/{habitId}", 1L)
+        mockMvc.perform(post(habitStatisticControllerLink + "/{habitId}", 1)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -110,7 +110,7 @@ class HabitStatisticControllerTest {
         when(habitStatisticService.saveByHabitIdAndUserId(2L, userVO.getId(), addHabitStatisticDto))
                 .thenThrow(NotFoundException.class);
 
-        mockMvc.perform(post(habitStatisticControllerLink + "/{habitId}", 2L)
+        mockMvc.perform(post(habitStatisticControllerLink + "/{habitId}", 2)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -122,7 +122,7 @@ class HabitStatisticControllerTest {
 
     @Test
     void saveHabitStatisticBadRequestTest() throws Exception {
-        mockMvc.perform(post(habitStatisticControllerLink + "/{habitId}", 1L)
+        mockMvc.perform(post(habitStatisticControllerLink + "/{habitId}", 1)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
@@ -140,7 +140,7 @@ class HabitStatisticControllerTest {
                          "  \"habitRate\": \"DEFAULT\"\n" +
                          "}";
 
-        mockMvc.perform(put(habitStatisticControllerLink + "/{id}", 1L)
+        mockMvc.perform(put(habitStatisticControllerLink + "/{id}", 1)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -172,7 +172,7 @@ class HabitStatisticControllerTest {
         when(habitStatisticService.update(2L, userVO.getId(), updateHabitStatisticDto))
                 .thenThrow(NotFoundException.class);
 
-        mockMvc.perform(put(habitStatisticControllerLink + "/{id}", 2L)
+        mockMvc.perform(put(habitStatisticControllerLink + "/{id}", 2)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -184,7 +184,7 @@ class HabitStatisticControllerTest {
 
     @Test
     void updateStatisticsBadRequestTest() throws Exception {
-        mockMvc.perform(put(habitStatisticControllerLink + "/{id}", 1L)
+        mockMvc.perform(put(habitStatisticControllerLink + "/{id}", 1)
                         .principal(principal)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
@@ -193,7 +193,7 @@ class HabitStatisticControllerTest {
 
     @Test
     void findAllByHabitIdTest() throws Exception {
-        mockMvc.perform(get(habitStatisticControllerLink + "/{habitId}", 1L))
+        mockMvc.perform(get(habitStatisticControllerLink + "/{habitId}", 1))
                 .andExpect(status().isOk());
 
         verify(habitStatisticService).findAllStatsByHabitId(1L);
@@ -201,7 +201,7 @@ class HabitStatisticControllerTest {
 
     @Test
     void findAllStatsByHabitAssignIdTest() throws Exception {
-        mockMvc.perform(get(habitStatisticControllerLink + "/assign/{habitAssignId}", 1L))
+        mockMvc.perform(get(habitStatisticControllerLink + "/assign/{habitAssignId}", 1))
                 .andExpect(status().isOk());
 
         verify(habitStatisticService).findAllStatsByHabitAssignId(1L);
@@ -228,7 +228,7 @@ class HabitStatisticControllerTest {
     @Test
     void findAmountOfHabitsInProgressTest() throws Exception {
         mockMvc.perform(get(habitStatisticControllerLink + "/in-progress/count")
-                        .param("userId", String.valueOf(1L)))
+                        .param("userId", String.valueOf(1)))
                 .andExpect(status().isOk());
 
         verify(habitStatisticService).getAmountOfHabitsInProgressByUserId(1L);
