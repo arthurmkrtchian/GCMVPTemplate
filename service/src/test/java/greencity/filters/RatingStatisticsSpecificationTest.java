@@ -20,6 +20,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,7 +89,6 @@ class RatingStatisticsSpecificationTest {
                 .type("pointsChanged")
                 .value(ratingStatisticsViewDto.getPointsChanged())
                 .build());
-
         RatingStatisticsSpecification ratingStatisticsSpecification = new RatingStatisticsSpecification(criteriaList);
 
         when(criteriaBuilderMock.conjunction()).thenReturn(predicateMock);
@@ -102,6 +103,7 @@ class RatingStatisticsSpecificationTest {
         when(userJoinMock.get(User_.EMAIL)).thenReturn(pathUserMailMock);
         when(criteriaBuilderMock.like(userJoinMock.get(User_.EMAIL).as(String.class),
                 "%" + criteriaList.get(1).getValue() + "%")).thenReturn(andUserMailPredicate);
+
         when(criteriaBuilderMock.and(andUserIdPredicate, andUserMailPredicate)).thenReturn(andUserMailPredicate);
 
         when(ratingStatisticsRootMock.get(RatingStatistics_.POINTS_CHANGED)).thenReturn(pathPointChangedMock);
@@ -109,6 +111,7 @@ class RatingStatisticsSpecificationTest {
                 ratingStatisticsRootMock.get(RatingStatistics_.POINTS_CHANGED),
                 criteriaList.get(2).getValue())
         ).thenReturn(andPointsChangedPredicate);
+
         when(criteriaBuilderMock.and(andUserMailPredicate, andPointsChangedPredicate)).thenReturn(andPointsChangedPredicate);
 
         ratingStatisticsSpecification.toPredicate(ratingStatisticsRootMock, criteriaQueryMock, criteriaBuilderMock);
@@ -190,6 +193,41 @@ class RatingStatisticsSpecificationTest {
         verify(criteriaBuilderMock).and(andIdPredicate, andEventNamePredicate);
         verify(criteriaBuilderMock).and(andEventNamePredicate, andCreateDatePredicate);
         verify(criteriaBuilderMock).and(andCreateDatePredicate, andRatingPredicate);
+    }
+
+    @Test
+    void toPredicateThrowNumberFormatExceptionWhenUserIdIsWrongTest() {
+        RatingStatisticsViewDto ratingStatisticsViewDto = new RatingStatisticsViewDto(
+                "", "", "WRONG_FORMAT", "", "",
+                "", "", ""
+        );
+        criteriaList = new ArrayList<>();
+        criteriaList.add(SearchCriteria.builder()
+                .key(RatingStatistics_.USER)
+                .type("userId")
+                .value(ratingStatisticsViewDto.getUserId())
+                .build());
+        RatingStatisticsSpecification ratingStatisticsSpecification = new RatingStatisticsSpecification(criteriaList);
+
+        when(criteriaBuilderMock.conjunction()).thenReturn(predicateMock);
+
+        when(ratingStatisticsRootMock.join(RatingStatistics_.user)).thenReturn(userJoinMock);
+        when(userJoinMock.get(User_.ID)).thenReturn(pathUserIdMock);
+
+        when(criteriaBuilderMock.equal(userJoinMock.get(User_.ID).as(String.class),
+                criteriaList.get(0).getValue())).thenThrow(NumberFormatException.class);
+        ratingStatisticsSpecification.toPredicate(ratingStatisticsRootMock, criteriaQueryMock, criteriaBuilderMock);
+
+        assertNotNull(predicateMock);
+    }
+
+    @Test
+    void toPredicateNullPointerExceptionTest() {
+        RatingStatisticsSpecification ratingStatisticsSpecification = new RatingStatisticsSpecification();
+        when(criteriaBuilderMock.conjunction()).thenReturn(predicateMock);
+        assertThrows(NullPointerException.class, () ->
+                ratingStatisticsSpecification
+                        .toPredicate(ratingStatisticsRootMock, criteriaQueryMock, criteriaBuilderMock));
     }
 }
 
