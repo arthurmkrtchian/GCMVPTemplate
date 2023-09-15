@@ -291,7 +291,6 @@ class HabitAssignControllerTest {
         UpdateUserShoppingListDto updateUserShoppingListDto = mapper.readValue(content,
             UpdateUserShoppingListDto.class);
 
-        System.out.println(updateUserShoppingListDto);
         verify(habitAssignService).updateUserShoppingListItem(updateUserShoppingListDto);
     }
 
