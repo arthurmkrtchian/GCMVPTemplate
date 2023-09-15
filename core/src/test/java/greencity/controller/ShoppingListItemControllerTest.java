@@ -7,14 +7,17 @@ import greencity.enums.ShoppingListItemStatus;
 import greencity.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 
 import java.util.*;
 
 import static greencity.ModelUtils.getPrincipal;
-import static greencity.ModelUtils.getUserVO;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +31,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.security.Principal;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ShoppingListItemControllerTest {
     @InjectMocks
     private ShoppingListItemController shoppingListItemController;
@@ -47,15 +52,8 @@ public class ShoppingListItemControllerTest {
 
     @BeforeEach
     void setup() {
-        userVO = getUserVO();
-        userService = mock(UserService.class);
-        modelMapper = mock(ModelMapper.class);
-
         when(userService.findByEmail(anyString())).thenReturn(userVO);
         when(modelMapper.map(userVO, UserVO.class)).thenReturn(userVO);
-
-        shoppingListItemService = mock(ShoppingListItemService.class);
-        shoppingListItemController = new ShoppingListItemController(shoppingListItemService);
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(shoppingListItemController)
                 .setCustomArgumentResolvers(new UserArgumentResolver(userService, modelMapper))
@@ -70,6 +68,7 @@ public class ShoppingListItemControllerTest {
         String jsonString = objectMapper.writeValueAsString(requestDtoList);
 
         List<UserShoppingListItemResponseDto> responseDtoList = new ArrayList<>();
+
         when(shoppingListItemService.saveUserShoppingListItems(anyLong(), anyLong(), anyList(), anyString()))
                 .thenReturn(responseDtoList);
 
