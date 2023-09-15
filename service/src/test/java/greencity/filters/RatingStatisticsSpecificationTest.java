@@ -112,7 +112,8 @@ class RatingStatisticsSpecificationTest {
                 criteriaList.get(2).getValue())
         ).thenReturn(andPointsChangedPredicate);
 
-        when(criteriaBuilderMock.and(andUserMailPredicate, andPointsChangedPredicate)).thenReturn(andPointsChangedPredicate);
+        when(criteriaBuilderMock.and(andUserMailPredicate, andPointsChangedPredicate))
+                .thenReturn(andPointsChangedPredicate);
 
         ratingStatisticsSpecification.toPredicate(ratingStatisticsRootMock, criteriaQueryMock, criteriaBuilderMock);
 
