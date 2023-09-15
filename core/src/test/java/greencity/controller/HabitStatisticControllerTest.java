@@ -182,7 +182,6 @@ class HabitStatisticControllerTest {
                 .update(2L, userVO.getId(), updateHabitStatisticDto);
     }
 
-
     @Test
     void updateStatisticsBadRequestTest() throws Exception {
         mockMvc.perform(put(habitStatisticControllerLink + "/{id}", 1)
