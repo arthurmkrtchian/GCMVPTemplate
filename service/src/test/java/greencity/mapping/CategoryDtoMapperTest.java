@@ -18,7 +18,7 @@ class CategoryDtoMapperTest {
     }
 
     @Test
-    @DisplayName("CategoryDtoMapper test")
+    @DisplayName("CategoryDto convert to Category test")
     public void testConvert() {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName("Test Name");

@@ -18,7 +18,7 @@ class CategoryDtoResponseMapperTest {
     }
 
     @Test
-    @DisplayName("ategoryDtoResponseMapper test")
+    @DisplayName("Category convert to CategoryDtoResponse test")
     public void testConvert() {
         Category category = new Category().setId(1L).setName("Test name");
 

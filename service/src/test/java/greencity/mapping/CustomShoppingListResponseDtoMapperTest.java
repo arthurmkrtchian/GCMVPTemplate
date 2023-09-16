@@ -43,7 +43,7 @@ class CustomShoppingListResponseDtoMapperTest {
                 new CustomShoppingListItem().setId(3L).setText("Test").setStatus(ShoppingListItemStatus.DONE)
         );
 
-        List<CustomShoppingListItemResponseDto> customShoppingListItemResponseDtoList = customShoppingListResponseDtoMapper.mapAllToList(customShoppingListItems);
+        List<CustomShoppingListItemResponseDto> actualList = customShoppingListResponseDtoMapper.mapAllToList(customShoppingListItems);
 
         List<CustomShoppingListItemResponseDto> expectedList = Arrays.asList(
                 new CustomShoppingListItemResponseDto(1L, "Test", ShoppingListItemStatus.ACTIVE),
@@ -51,6 +51,6 @@ class CustomShoppingListResponseDtoMapperTest {
                 new CustomShoppingListItemResponseDto(3L, "Test", ShoppingListItemStatus.DONE)
         );
 
-        assertThat(customShoppingListItemResponseDtoList).isEqualTo(expectedList);
+        assertThat(actualList).isEqualTo(expectedList);
     }
 }
