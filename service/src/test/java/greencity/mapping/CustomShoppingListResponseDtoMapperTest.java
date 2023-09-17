@@ -35,7 +35,7 @@ class CustomShoppingListResponseDtoMapperTest {
     }
 
     @Test
-    @DisplayName("CustomShoppingListItem convert to CustomShoppingListItemResponseDto test")
+    @DisplayName("CustomShoppingListItem list convert to CustomShoppingListItemResponseDto list test")
     public void testMapAllToList() {
         List<CustomShoppingListItem> customShoppingListItems = Arrays.asList(
                 new CustomShoppingListItem().setId(1L).setText("Test").setStatus(ShoppingListItemStatus.ACTIVE),
