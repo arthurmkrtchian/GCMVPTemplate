@@ -1,11 +1,10 @@
 package greencity.mapping;
 
+import static greencity.ModelUtils.getLanguage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 import greencity.dto.habittranslation.HabitTranslationDto;
 import greencity.entity.HabitTranslation;
-import greencity.entity.Language;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,12 +21,11 @@ class HabitTranslationDtoMapperTest {
 
     @Test
     void convertTest() {
-        Language language = mock(Language.class);
         HabitTranslation habitTranslation = HabitTranslation.builder()
                 .name("Test Habit")
                 .description("This is a test habit.")
                 .habitItem("Test Item")
-                .language(language)
+                .language(getLanguage())
                 .build();
 
         HabitTranslationDto habitTranslationDto = mapper.convert(habitTranslation);
@@ -35,16 +33,15 @@ class HabitTranslationDtoMapperTest {
         assertEquals(habitTranslation.getName(), habitTranslationDto.getName());
         assertEquals(habitTranslation.getDescription(), habitTranslationDto.getDescription());
         assertEquals(habitTranslation.getHabitItem(), habitTranslationDto.getHabitItem());
-        assertEquals(language.getCode(), habitTranslationDto.getLanguageCode());
+        assertEquals(getLanguage().getCode(), habitTranslationDto.getLanguageCode());
     }
 
     @Test
     void mapAllToListTest() {
-        Language language = mock(Language.class);
         HabitTranslation habitTranslation1 = HabitTranslation.builder()
                 .name("Test Habit 1")
                 .description("This is a test habit 1.")
-                .language(language)
+                .language(getLanguage())
                 .habitItem("Test Item 1")
 
                 .build();
@@ -52,7 +49,7 @@ class HabitTranslationDtoMapperTest {
                 .name("Test Habit 2")
                 .description("This is a test habit 2.")
                 .habitItem("Test Item 2")
-                .language(language)
+                .language(getLanguage())
                 .build();
         List<HabitTranslation> habitTranslationList = Arrays.asList(habitTranslation1, habitTranslation2);
 
