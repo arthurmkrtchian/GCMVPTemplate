@@ -135,8 +135,6 @@ class HabitAssignControllerTest {
     @Test
     void testUpdateAssignByHabitAssignId() throws Exception {
         Long habitAssignId = 1L;
-        UserVO userVO = getUserVO();
-        when(userService.findByEmail(anyString())).thenReturn(userVO);
 
         String content = "{\n" +
             "  \"status\": \"INPROGRESS\"\n" +
