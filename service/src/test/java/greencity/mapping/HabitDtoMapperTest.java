@@ -27,7 +27,7 @@ class HabitDtoMapperTest {
     private HabitDtoMapper habitDtoMapper;
 
     @Test
-    void convertTest() {
+    void testConvert() {
         HabitTranslation habitTranslation = HabitTranslation.builder()
                 .id(1L)
                 .name("Name")

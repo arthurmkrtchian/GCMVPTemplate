@@ -16,7 +16,7 @@ class HabitAssignUserDurationDtoMapperTest {
     private HabitAssignUserDurationDtoMapper habitAssignUserDurationDtoMapper;
 
     @Test
-    void convertTest() {
+    void testConvert() {
         HabitAssign habitAssign = ModelUtils.getHabitAssign();
 
         HabitAssignUserDurationDto expected = HabitAssignUserDurationDto.builder()
