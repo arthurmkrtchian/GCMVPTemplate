@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,17 +23,18 @@ public class EcoNewsVOMapperTest {
     void testConvertEcoNewsToEcoNewsVO() {
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
         EcoNews ecoNews = ModelUtils.getEcoNews();
-        UserVO user = ModelUtils.getUserVO();
-        ecoNews.setUsersLikedNews(new HashSet<>());
-        ecoNews.setUsersDislikedNews(new HashSet<>());
+        UserVO userVO = ModelUtils.getUserVO();
+        User user = ModelUtils.getUser();
+        ecoNews.setUsersLikedNews(Collections.singleton(user));
+        ecoNews.setUsersDislikedNews(Collections.singleton(user));
         ecoNews.setEcoNewsComments(List.of(ecoNewsComment));
 
         EcoNewsVO expected = EcoNewsVO.builder()
                 .id(ecoNews.getId())
                 .author(UserVO.builder()
-                        .id(user.getId())
-                        .name(user.getName())
-                        .role(user.getRole())
+                        .id(userVO.getId())
+                        .name(userVO.getName())
+                        .role(userVO.getRole())
                         .build())
                 .creationDate(ecoNews.getCreationDate())
                 .imagePath(ecoNews.getImagePath())

@@ -9,6 +9,7 @@ import greencity.entity.User;
 import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,7 +25,7 @@ public class EcoNewsCommentVOMapperTest {
         parentComment.setUsersLiked(new HashSet<>());
         parentComment.setId(2L);
         EcoNewsComment ecoNewsComment = ModelUtils.getEcoNewsComment();
-        ecoNewsComment.setUsersLiked(new HashSet<>());
+        ecoNewsComment.setUsersLiked(Collections.singleton(user));
         ecoNewsComment.setParentComment(parentComment);
 
         EcoNewsCommentVO expected = EcoNewsCommentVO.builder()
@@ -38,7 +39,10 @@ public class EcoNewsCommentVOMapperTest {
                         .name(user.getName())
                         .role(user.getRole())
                         .build())
-                .usersLiked(Collections.emptySet())
+                .usersLiked(ecoNewsComment.getUsersLiked().stream().map(userLiked -> UserVO.builder()
+                                .id(userLiked.getId())
+                                .build())
+                        .collect(Collectors.toSet()))
                 .ecoNews(EcoNewsVO.builder()
                         .id(ecoNewsComment.getEcoNews().getId())
                         .build())
