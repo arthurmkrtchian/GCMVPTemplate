@@ -42,7 +42,7 @@ class HabitDtoMapperTest {
                         .isCustomHabit(true)
                         .userId(1L)
                         .tags(new HashSet<>(ModelUtils.getHabitsTags()))
-                        .customShoppingListItems(Collections.singletonList(ModelUtils.getCustomShoppingListItem()))
+                        .shoppingListItems(new HashSet<>(Collections.singleton(ModelUtils.getShoppingListItem())))
                         .build())
                 .build();
 
