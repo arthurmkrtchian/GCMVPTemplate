@@ -6,6 +6,7 @@ import greencity.dto.habitstatuscalendar.HabitStatusCalendarDto;
 import greencity.dto.user.UserShoppingListItemAdvanceDto;
 import greencity.entity.HabitAssign;
 import greencity.entity.UserShoppingListItem;
+import greencity.enums.ShoppingListItemStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +29,8 @@ class HabitAssignMapperTest {
         HabitAssign habitAssign = getHabitAssign();
         List<UserShoppingListItem> userShoppingListItems = new ArrayList<>();
         userShoppingListItems.add(getUserShoppingListItem());
+        userShoppingListItems.get(0).setStatus(ShoppingListItemStatus.INPROGRESS);
+        habitAssign.setUserShoppingListItems(userShoppingListItems);
 
         HabitAssignDto habitAssignDto = HabitAssignDto.builder()
                 .id(habitAssign.getId())
@@ -61,13 +64,16 @@ class HabitAssignMapperTest {
                 .build();
         HabitAssign habitAssignConverted = mapper.convert(habitAssignDto);
 
+        assertEquals(habitAssign.getUserShoppingListItems().get(0).getId(),
+                habitAssignConverted.getUserShoppingListItems().get(0).getId());
+        assertEquals(habitAssign.getUserShoppingListItems().get(0).getStatus(),
+                habitAssignConverted.getUserShoppingListItems().get(0).getStatus());
         assertEquals(habitAssign.getHabit().getId(), habitAssignConverted.getHabit().getId());
         assertEquals(habitAssign.getHabit().getComplexity(), habitAssignConverted.getHabit().getComplexity());
         assertEquals(habitAssign.getHabitStreak(), habitAssignConverted.getHabitStreak());
         assertEquals(habitAssign.getCreateDate(), habitAssignConverted.getCreateDate());
         assertEquals(habitAssign.getWorkingDays(), habitAssignConverted.getWorkingDays());
         assertEquals(habitAssign.getDuration(), habitAssignConverted.getDuration());
-        assertEquals(habitAssign.getUserShoppingListItems(), habitAssignConverted.getUserShoppingListItems());
         assertEquals(habitAssign.getLastEnrollmentDate(), habitAssignConverted.getLastEnrollmentDate());
     }
 }
