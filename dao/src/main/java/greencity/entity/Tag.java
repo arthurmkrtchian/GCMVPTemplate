@@ -15,8 +15,8 @@ import java.util.Set;
 @Setter
 @Builder
 @Table(name = "tags")
-@ToString(exclude = {"ecoNews", "habits", "events"})
-@EqualsAndHashCode(exclude = {"ecoNews", "habits", "events"})
+@ToString(exclude = {"ecoNews", "habits", "tagTranslations"})
+@EqualsAndHashCode(exclude = {"ecoNews", "habits", "tagTranslations"})
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
