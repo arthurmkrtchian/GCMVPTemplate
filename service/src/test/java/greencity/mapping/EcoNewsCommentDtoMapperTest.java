@@ -18,6 +18,7 @@ public class EcoNewsCommentDtoMapperTest {
     @Test
     void convertOriginalComment() {
         EcoNewsComment originalComment = ModelUtils.getEcoNewsComment();
+        originalComment.setModifiedDate(originalComment.getCreatedDate());
         originalComment.setUsersLiked(new HashSet<>());
 
         EcoNewsCommentDto dtoOriginalComment = mapper.convert(originalComment);
