@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.security.Principal;
 import java.util.List;
 import java.util.Locale;
@@ -316,8 +317,12 @@ public class EcoNewsController {
      * @author Mamchuk Orest
      */
     @ApiOperation(value = "Find count of published eco news")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST)
+    })
     @GetMapping("/count")
-    public ResponseEntity<Long> findAmountOfPublishedNews(@RequestParam Long userId) {
+    public ResponseEntity<Long> findAmountOfPublishedNews(@RequestParam @NotNull Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(ecoNewsService.getAmountOfPublishedNewsByUserId(userId));
     }
 
