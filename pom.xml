@@ -40,7 +40,7 @@
         <test.containers.version>1.15.1</test.containers.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <net.java.dev.jna.version>4.5.2</net.java.dev.jna.version>
-         <sonar.organization>greencity23</sonar.organization>
+        <sonar.organization>arthurmkrtchian</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
@@ -71,6 +71,17 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <dataFileIncludes>**/target/jacoco/*.exec</dataFileIncludes>
+                            <outputDirectory>${project.basedir}/target/site/jacoco-aggregate</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
